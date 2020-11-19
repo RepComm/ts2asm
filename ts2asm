@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# fix for executing as command from some other dir
+# TODO - might not work after packing into a binary
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+echo ${DIR}
+
+deno run -c ${DIR}/tsconfig.json --allow-net --allow-read --allow-write --unstable ${DIR}/index.ts "$@"

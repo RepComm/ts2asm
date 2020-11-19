@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "importsNotUsedAsValues": "remove",
+    "isolatedModules": false,
+    // "module": "ESNext"
+  }
+}
