@@ -1,0 +1,40 @@
+{
+  "name": "ts2asm",
+  "version": "1.0.0",
+  "description": "TypeScript to assembly",
+  "main": "dist/index.js",
+  "module": "esnext",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@types/node": "^14.14.9"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-transform-typescript": "^7.10.5",
+    "@babel/preset-env": "^7.10.4"
+  },
+  "scripts": {
+    "test": "test/test.sh",
+    "build": "babel src --extensions '.ts' --copy-files -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RepComm/ts2asm.git"
+  },
+  "keywords": [
+    "ts",
+    "to",
+    "assembly",
+    "transpiler"
+  ],
+  "author": "RepComm (Jon)",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/RepComm/ts2asm/issues"
+  },
+  "homepage": "https://github.com/RepComm/ts2asm#readme"
+}

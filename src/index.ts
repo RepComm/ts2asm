@@ -1,8 +1,11 @@
 
-import * as path from "https://deno.land/std/path/mod.ts";
-import { walk, exists, ensureDirSync, ensureDir } from "https://deno.land/std/fs/mod.ts";
+import * as path from "path";
+import { readTextFile, ensureDir } from "./aliases.js";
 
-let port: number = 8080;
+// import { JavaScriptScanner, tokenizer } from "@repcomm/rdp-ts";
+
+const PRG_ARGS = process.argv;
+
 let textDec = new TextDecoder();
 let textEnc = new TextEncoder();
 
@@ -19,8 +22,8 @@ let options: Options = {
   OUTPUT_DIR: "build"
 }
 
-for (let i = 0; i < Deno.args.length; i++) {
-  let arg: string = Deno.args[i];
+for (let i = 0; i < PRG_ARGS.length; i++) {
+  let arg: string = PRG_ARGS[i];
   if (arg.startsWith("-")) {
     let argparts = arg.split("=");
     let aname = argparts[0];
@@ -61,31 +64,40 @@ function doHelp() {
 
 if (!options.INPUT_FILE) {
   doError("No input file specified, you can use -help");
-  Deno.exit(-1);
+  process.exit(-1);
 }
 if (!options.OUTPUT_DIR) {
   doWarn("Output dir is not specified, 'build' will be used instead, you can use -help");
 }
 
-//TODO - traverse imports
-let src: string = await Deno.readTextFile(options.INPUT_FILE);
-doLog(
-  "Found input",
-  src
-);
+async function main() {
 
-//Make sure output dir exists
-await ensureDir(options.OUTPUT_DIR);
+  //TODO - traverse imports
+  let src: string = await readTextFile(options.INPUT_FILE);
+  doLog(
+    "Found input",
+    src
+  );
 
-//grab the input filename without path
-let fname = path.basename(options.INPUT_FILE);
+  //Make sure output dir exists
+  await ensureDir(options.OUTPUT_DIR);
 
-//create a similar named output file, but with output dir
-let fpath = path.join(options.OUTPUT_DIR, fname);
+  //grab the input filename without path
+  let fname = path.basename(options.INPUT_FILE);
 
-//TODO - lexer (probably snatch from recursive-descent-parser)
+  //create a similar named output file, but with output dir
+  let fpath = path.join(options.OUTPUT_DIR, fname);
 
-//write the text file
-//TODO - have to write transpiled assembly, not source input
-await Deno.writeTextFile(fpath, src, { create: true });
+  //TODO - lexer (probably snatch from recursive-descent-parser)
 
+  // let jsScanner = new JavaScriptScanner();
+  // let tokens = await tokenizer(src, jsScanner, ["whsp"]);
+  // console.log(tokens);
+
+  //write the text file
+  //TODO - have to write transpiled assembly, not source input
+  // await Deno.writeTextFile(fpath, src, { create: true });
+
+}
+
+main();

@@ -1,2 +1,3 @@
 test/build/
 test/ts2asm
+/node_modules/
