@@ -1,5 +1,5 @@
 
-import Token from "./token.js";
+import { Token } from "./token.js";
 
 /**Data returned by a scanner pass
  */
@@ -22,7 +22,7 @@ export interface ScannerPass {
   (data: string, offset: number): ScannerData;
 }
 
-export default class Scanner {
+export class Scanner {
   private passes: Map<string, ScannerPass>;
   data?: string;
   offset: number;

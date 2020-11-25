@@ -1,17 +1,19 @@
 
-import Scanner, { ScannerData } from "../scanner.js";
-import Token from "../token.js";
+import { Parser } from "../parser/parser.js";
+
+import { Scanner, ScannerData } from "../tokenizer/scanner.js";
+import { Token } from "../tokenizer/token.js";
 
 const numbers = "0123456789";
 const ops = "-+/*%=";
 const ws = " \n";
 const nl = "\n";
 const idents = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-const terms = ";.,"
+const terms = ":;.,"
 const paren = "()";
 const brackets = "{[]}";
 
-export default class JavaScriptScanner extends Scanner {
+export class TypeScriptScanner extends Scanner {
   static IDENTIFIER: string = Token.TYPE_IDENTIFIER;
   static STRING_LITERAL: string = Token.TYPE_STRING_LITERAL;
   static NUMBER_LITERAL: string = Token.TYPE_NUMBER_LITERAL;
@@ -22,7 +24,7 @@ export default class JavaScriptScanner extends Scanner {
   static PARENTHESIS: string = "pare";
   constructor() {
     super();
-    this.addPass(JavaScriptScanner.IDENTIFIER, (data, offset) => {
+    this.addPass(TypeScriptScanner.IDENTIFIER, (data, offset) => {
       let result: ScannerData = {
         success: false,
         readChars: 0,
@@ -52,7 +54,7 @@ export default class JavaScriptScanner extends Scanner {
 
       return result;
     })
-      .addPass(JavaScriptScanner.STRING_LITERAL, (data, offset) => {
+      .addPass(TypeScriptScanner.STRING_LITERAL, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -92,7 +94,7 @@ export default class JavaScriptScanner extends Scanner {
 
         return result;
       })
-      .addPass(JavaScriptScanner.NUMBER_LITERAL, (data, offset) => {
+      .addPass(TypeScriptScanner.NUMBER_LITERAL, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -122,7 +124,7 @@ export default class JavaScriptScanner extends Scanner {
 
         return result;
       })
-      .addPass(JavaScriptScanner.OPERATOR, (data, offset) => {
+      .addPass(TypeScriptScanner.OPERATOR, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -134,7 +136,7 @@ export default class JavaScriptScanner extends Scanner {
         }
         return result;
       })
-      .addPass(JavaScriptScanner.BRACKET, (data, offset) => {
+      .addPass(TypeScriptScanner.BRACKET, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -146,7 +148,7 @@ export default class JavaScriptScanner extends Scanner {
         }
         return result;
       })
-      .addPass(JavaScriptScanner.PARENTHESIS, (data, offset) => {
+      .addPass(TypeScriptScanner.PARENTHESIS, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -158,7 +160,7 @@ export default class JavaScriptScanner extends Scanner {
         }
         return result;
       })
-      .addPass(JavaScriptScanner.TERMINATOR, (data, offset) => {
+      .addPass(TypeScriptScanner.TERMINATOR, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -170,7 +172,7 @@ export default class JavaScriptScanner extends Scanner {
         }
         return result;
       })
-      .addPass(JavaScriptScanner.WHITESPACE, (data, offset) => {
+      .addPass(TypeScriptScanner.WHITESPACE, (data, offset) => {
         let result: ScannerData = {
           success: false,
           readChars: 0,
@@ -196,5 +198,11 @@ export default class JavaScriptScanner extends Scanner {
         }
         return result;
       });
+  }
+}
+
+export class TypeScriptParser extends Parser {
+  constructor() {
+    super();
   }
 }

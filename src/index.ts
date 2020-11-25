@@ -1,24 +1,14 @@
 
-import log from "why-is-node-running";
-
 import * as path from "path";
 import { readTextFile, ensureDir } from "./aliases.js";
 
-import JavaScriptScanner from "./tokenizer/langs/javascript.js";
-import tokenizer from "./tokenizer/tokenizer.js";
+import { TypeScriptScanner } from "./langs/typescript.js";
+import { tokenizer } from "./tokenizer/tokenizer.js";
 
 const PRG_ARGS = process.argv;
 
 let textDec = new TextDecoder();
 let textEnc = new TextEncoder();
-
-// setTimeout(()=>{
-//   log();
-// }, 5000);
-
-// function cwd (): string {
-//   return path.dirname(path.fromFileUrl(import.meta.url));
-// }
 
 interface Options {
   INPUT_FILE?: string;
@@ -98,19 +88,19 @@ async function main() {
     outputFileName += ".asm";
   }
 
-  console.log(inputFileName, outputFileName);
+  doLog(`Parsing ${inputFileName}, will output to ${outputFileName}`);
 
   //create a similar named output file, but with output dir
   let outputFilePath = path.join(options.OUTPUT_DIR, inputFileName);
 
-  let jsScanner = new JavaScriptScanner();
+  let jsScanner = new TypeScriptScanner();
   tokenizer(src, jsScanner, ["whsp"]).then((tokens)=>{
     console.log(tokens);
   }).catch((ex)=>{
     console.error(ex);
   });
 
-  console.log("done");
+  doLog("Lexar finished");
   //write the text file
   //TODO - have to write transpiled assembly, not source input
 }

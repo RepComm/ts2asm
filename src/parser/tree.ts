@@ -1,6 +1,6 @@
 
 import { Statement } from "./statement.js";
 
-export default interface Tree {
+export interface Tree {
   statements?: Array<Statement>;
 }

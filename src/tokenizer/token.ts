@@ -1,5 +1,5 @@
 
-export default class Token {
+export class Token {
   type: string;
   data?: string;
   line: number;

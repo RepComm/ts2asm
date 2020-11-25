@@ -1,10 +1,10 @@
 
-import Tree from "./tree.js";
-import Token, { TokenAccessor } from "../tokenizer/token.js";
+import { Tree } from "./tree.js";
+import { Token, TokenAccessor } from "../tokenizer/token.js";
 
 import { StatementTemplate, Statement } from "./statement.js";
 
-export default class Parser {
+export class Parser {
   stemps: Array<StatementTemplate>;
   constructor() {
     this.stemps = new Array();
