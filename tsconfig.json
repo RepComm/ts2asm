@@ -3,6 +3,7 @@
     "importsNotUsedAsValues": "remove",
     "isolatedModules": false,
     "module": "ESNext",
-    "target": "ESNext"
+    "target": "ESNext",
+    "sourceMap": true
   }
 }

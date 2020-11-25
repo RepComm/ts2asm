@@ -1,13 +1,20 @@
 
+import log from "why-is-node-running";
+
 import * as path from "path";
 import { readTextFile, ensureDir } from "./aliases.js";
 
-// import { JavaScriptScanner, tokenizer } from "@repcomm/rdp-ts";
+import JavaScriptScanner from "./tokenizer/langs/javascript.js";
+import tokenizer from "./tokenizer/tokenizer.js";
 
 const PRG_ARGS = process.argv;
 
 let textDec = new TextDecoder();
 let textEnc = new TextEncoder();
+
+// setTimeout(()=>{
+//   log();
+// }, 5000);
 
 // function cwd (): string {
 //   return path.dirname(path.fromFileUrl(import.meta.url));
@@ -71,33 +78,41 @@ if (!options.OUTPUT_DIR) {
 }
 
 async function main() {
-
   //TODO - traverse imports
   let src: string = await readTextFile(options.INPUT_FILE);
   doLog(
-    "Found input",
-    src
+    "Reading",
+    options.INPUT_FILE
   );
 
   //Make sure output dir exists
   await ensureDir(options.OUTPUT_DIR);
 
   //grab the input filename without path
-  let fname = path.basename(options.INPUT_FILE);
+  let inputFileName = path.basename(options.INPUT_FILE);
+
+  let outputFileName = inputFileName;
+  let inputFileExt = path.extname(inputFileName);
+  if (outputFileName.endsWith(inputFileExt)) {
+    outputFileName = inputFileName.substring(0, inputFileName.length - inputFileExt.length);
+    outputFileName += ".asm";
+  }
+
+  console.log(inputFileName, outputFileName);
 
   //create a similar named output file, but with output dir
-  let fpath = path.join(options.OUTPUT_DIR, fname);
+  let outputFilePath = path.join(options.OUTPUT_DIR, inputFileName);
 
-  //TODO - lexer (probably snatch from recursive-descent-parser)
+  let jsScanner = new JavaScriptScanner();
+  tokenizer(src, jsScanner, ["whsp"]).then((tokens)=>{
+    console.log(tokens);
+  }).catch((ex)=>{
+    console.error(ex);
+  });
 
-  // let jsScanner = new JavaScriptScanner();
-  // let tokens = await tokenizer(src, jsScanner, ["whsp"]);
-  // console.log(tokens);
-
+  console.log("done");
   //write the text file
   //TODO - have to write transpiled assembly, not source input
-  // await Deno.writeTextFile(fpath, src, { create: true });
-
 }
 
 main();
