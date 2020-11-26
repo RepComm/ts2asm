@@ -1,14 +1,20 @@
 
 import * as path from "path";
-import { readTextFile, ensureDir } from "./aliases.js";
+import { readTextFile, readJsonFile, ensureDir } from "./aliases.js";
 
 import { TypeScriptScanner } from "./langs/typescript.js";
 import { tokenizer } from "./tokenizer/tokenizer.js";
+import { parser } from "./parser/parser.js";
+import { Language } from "./parser/language.js";
 
 const PRG_ARGS = process.argv;
 
 let textDec = new TextDecoder();
 let textEnc = new TextEncoder();
+
+//__dirname fix for node es module mode
+const moduleURL = new URL(import.meta.url);
+const __dirname = path.dirname(moduleURL.pathname);
 
 interface Options {
   INPUT_FILE?: string;
@@ -93,16 +99,30 @@ async function main() {
   //create a similar named output file, but with output dir
   let outputFilePath = path.join(options.OUTPUT_DIR, inputFileName);
 
-  let jsScanner = new TypeScriptScanner();
-  tokenizer(src, jsScanner, ["whsp"]).then((tokens)=>{
+  let tsScanner = new TypeScriptScanner();
+
+  let tsLangPath = path.join(__dirname, "langs", "typescript.json");
+
+  let tsLang = Language.fromJSON(
+    await readJsonFile(
+      tsLangPath
+    )
+  );
+  console.log("Language", tsLang);
+
+  tokenizer(src, tsScanner, ["whsp"]).then((tokens) => {
     console.log(tokens);
-  }).catch((ex)=>{
+
+    doLog("Lexar finished, generating AST");
+
+    let tree = parser(tsLang, tokens);
+  }).catch((ex) => {
     console.error(ex);
   });
 
-  doLog("Lexar finished");
   //write the text file
   //TODO - have to write transpiled assembly, not source input
+  //WRITE TO: path.join(cliOriginDir, outputFileName)
 }
 
 main();

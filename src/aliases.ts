@@ -27,6 +27,18 @@ export const readTextFile = (fpath: string): Promise<string> => {
   });
 }
 
+/**Read a json file w/ schema
+ * @param fpath path to the file
+ * @param reviver A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is.
+ */
+export function readJsonFile <T>(fpath: string, reviver?: (this: any, key: string, value: any) => any): Promise<T> {
+  return new Promise<T>( async (resolve, reject)=>{
+    let txt = await readTextFile(fpath);
+    let result = JSON.parse(txt, reviver);
+    resolve(result);
+  });
+}
+
 export const ensureDir = (dpath: string, create: boolean = true): Promise<void> => {
   return new Promise((resolve, reject) => {
     fs.access(dpath, (err) => {

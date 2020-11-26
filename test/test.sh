@@ -1,1 +1,1 @@
-../ts2asm -in=src/main.ts -out=build
+ts2asm -in=src/main.ts -out=build

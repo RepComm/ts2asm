@@ -1,6 +1,4 @@
 
-import { Parser } from "../parser/parser.js";
-
 import { Scanner, ScannerData } from "../tokenizer/scanner.js";
 import { Token } from "../tokenizer/token.js";
 
@@ -15,6 +13,7 @@ const brackets = "{[]}";
 
 export class TypeScriptScanner extends Scanner {
   static IDENTIFIER: string = Token.TYPE_IDENTIFIER;
+  static KEYWORD: string = "keyw";
   static STRING_LITERAL: string = Token.TYPE_STRING_LITERAL;
   static NUMBER_LITERAL: string = Token.TYPE_NUMBER_LITERAL;
   static OPERATOR: string = Token.TYPE_OPERATOR;
@@ -198,11 +197,5 @@ export class TypeScriptScanner extends Scanner {
         }
         return result;
       });
-  }
-}
-
-export class TypeScriptParser extends Parser {
-  constructor() {
-    super();
   }
 }

@@ -1,5 +1,5 @@
 
-import { Statement } from "./statement.js";
+import { Statement } from "./language.js";
 
 export interface Tree {
   statements?: Array<Statement>;
