@@ -1,14 +1,22 @@
 # ts2asm
-Transpile typescript to assembly<br/>
+Compile typescript to x86 assembly<br/>
 In the format of [the flat assembler](https://flatassembler.net/)
 
-## Why
-I'm trying to write an OS, and<br>
-I don't want to write it in assembly or c<br>
+## why
+Used as the compiler for [bugout](https://github.com/RepComm/bugout)<br>
+AKA: I didn't want to write an OS in C<br>
 
-## Running
-Requires deno to run
-[deno](https://deno.land/)
+## state
+> Cannot produce assembly yet
+
+Currently designing API that allows for language definition entirely within `JSON`
+
+## running
+
+> NOTE: This isn't ready for use yet
+
+Requires node to run
+[node](https://nodejs.org)
 
 Run
 ```bash
