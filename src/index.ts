@@ -2,7 +2,7 @@
 import * as path from "path";
 import { readTextFile, readJsonFile, ensureDir } from "./aliases.js";
 
-import { TypeScriptScanner } from "./langs/typescript.js";
+import { TypeScriptScanner } from "./langs/typescript/typescript.js";
 import { tokenizer } from "./tokenizer/tokenizer.js";
 import { parser } from "./parser/parser.js";
 import { Language } from "./parser/language.js";
@@ -119,6 +119,8 @@ async function main() {
   }).catch((ex) => {
     console.error(ex);
   });
+
+  let mynum = 0.1;
 
   //write the text file
   //TODO - have to write transpiled assembly, not source input

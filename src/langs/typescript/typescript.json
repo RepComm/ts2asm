@@ -1,0 +1,9 @@
+{
+  "name":"typescript",
+  "tokens":[
+    "typescript.tokens.json"
+  ],
+  "statmentTemplates":[
+    "typescript.statements.json"
+  ]
+}

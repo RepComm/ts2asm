@@ -1,4 +1,6 @@
 
+import { Token } from "../tokenizer/token.js";
+
 export type RequirementType = "token" | "statement";
 
 /**Defines a requirement for a statement definition to be satisfied
@@ -80,7 +82,7 @@ export interface LanguageDefinition {
 
 export class Language {
   private name: string;
-  statmentTemplates: Set<StatementTemplate>;
+  private statmentTemplates: Set<StatementTemplate>;
 
   constructor(name: string) {
     this.name = name;
@@ -101,6 +103,9 @@ export class Language {
     this.addStatementTemplate(result);
     return result;
   }
+  getStatementTemplates (): Set<StatementTemplate> {
+    return this.statmentTemplates;
+  }
   static fromJSON(langDef: LanguageDefinition): Language {
     let result = new Language(langDef.name);
 
@@ -110,6 +115,20 @@ export class Language {
       result.addStatementTemplate(statement);
     }
 
+    return result;
+  }
+  toJSON (): LanguageDefinition {
+    let templateCount = this.statmentTemplates.size;
+    let templateDefs = new Array<StatementDefinition>(templateCount);
+    let i=0;
+    for (let template of this.statmentTemplates) {
+      templateDefs[i] = template.toJSON();
+      i++;
+    }
+    let result: LanguageDefinition = {
+      name: this.getName(),
+      statmentTemplates: templateDefs
+    };
     return result;
   }
 }
@@ -131,6 +150,9 @@ export class StatementTemplate {
     this.id = id;
     this.requirements = new Array();
   }
+  getId(): string {
+    return this.id;
+  }
   setAbstract(abs: boolean): this {
     this.abstract = abs;
     return this;
@@ -146,6 +168,9 @@ export class StatementTemplate {
     this.requirements.push(req);
     return this;
   }
+  getRequirements (): Array<Requirement> {
+    return this.requirements;
+  }
   static fromJSON(statDef: StatementDefinition): StatementTemplate {
     let result = new StatementTemplate(statDef.id);
 
@@ -158,6 +183,22 @@ export class StatementTemplate {
 
     return result;
   }
+  toJSON (): StatementDefinition {
+    let requirementCount = this.requirements.length;
+    let requirementDefs = new Array<RequirementDefinition>(requirementCount);
+
+    let i=0;
+    for (let requirement of this.requirements) {
+      requirementDefs[i] = requirement.toJSON();
+      i++;
+    }
+
+    let result: StatementDefinition = {
+      id: this.getId(),
+      requirements: requirementDefs
+    };
+    return result;
+  }
 }
 
 export class Requirement {
@@ -168,24 +209,52 @@ export class Requirement {
   private tokenData?: string;
 
   constructor () {
-
+    this.repeat = 0;
+  }
+  getType(): RequirementType {
+    return this.type;
   }
   setType(type: RequirementType): this {
     this.type = type;
     return this;
   }
+  getTokenType (): string|undefined {
+    return this.tokenType;
+  }
   setTokenType (type: string): this {
     this.tokenType = type;
     return this;
+  }
+  getTokenData(): string|undefined {
+    return this.tokenData;
   }
   setTokenData (data: string): this {
     this.tokenData = data;
     return this;
   }
+  getStatementId (): string|undefined {
+    return this.statementId;
+  }
   setStatementId (id: string): this {
     this.statementId = id;
     return this;
   }
+  hasStatementId (): boolean {
+    return this.statementId != null && this.statementId != null;
+  }
+  getRepeats (): number {
+    return this.repeat;
+  }
+  /**Set how many times to repeat this requirement to satisfy a statement using it
+   * 
+   * `-1` = unlimited (until next requirement is satisfied)
+   * 
+   * `0` = no *additional* repeats
+   * 
+   * `1` = requires 2 of same requirement in a row
+   * 
+   * @param times 
+   */
   setRepeats (times: number): this {
     this.repeat = times;
     return this;
@@ -201,7 +270,19 @@ export class Requirement {
     result.setRepeats(def.repeat);
     return result;
   }
+  toJSON (): RequirementDefinition {
+    //TODO - error check here
+    return {
+      type: this.getType(),
+      repeat: this.getRepeats(),
+      tokenData: this.getTokenData(),
+      tokenType: this.getTokenType(),
+      statementId: this.getStatementId()
+    };
+  }
 }
+
+export type StatementItem = Token | Statement;
 
 /**A valid instance of a statement template
  * 
@@ -209,5 +290,12 @@ export class Requirement {
  * completely satisfied
  */
 export class Statement {
-
+  items: Array<StatementItem>;
+  constructor () {
+    this.items = new Array();
+  }
+  addItem (item: StatementItem): this {
+    this.items.push(item);
+    return this;
+  }
 }

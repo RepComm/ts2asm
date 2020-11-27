@@ -15,11 +15,19 @@ Currently designing API that allows for language definition entirely within `JSO
 
 > NOTE: This isn't ready for use yet
 
-Requires node to run
-[node](https://nodejs.org)
+Requires [node](https://nodejs.org)
 
-Run
+> NOTE: dir containing `ts2asm` should be added to the PATH environment variable
+
+Run (ts2asm is used from PATH var)
 ```bash
 ts2asm -in src/main.ts -out build
+```
+
+Run (ts2asm is not added to PATH var)
+```bash
+cd ~/Desktop/MyProject
+
+path/to/ts2asm-install/ts2asm -in src/main.ts -out build
 ```
 

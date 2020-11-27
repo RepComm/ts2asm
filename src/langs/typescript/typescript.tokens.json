@@ -1,0 +1,41 @@
+{
+  "tokens":[
+    {
+      "type":"number",
+      "requirements":[
+        {
+          "type":"char",
+          "char":"0123456789.",
+          "repeat-min": 1,
+          "repeat-max": 16
+        },
+        {
+          "type":"enforce-single",
+          "enforce-single":"."
+        }
+      ]
+    },
+    {
+      "type":"string",
+      "requirements":[
+        {
+          "type":"char",
+          "save":"quote-type",
+          "char-next":"\"'"
+        },
+        {
+          "type":"char-not-match",
+          "char-not-match":"quote-type",
+          "char-not-unless":"char-previous",
+          "char-previous":"\\",
+          "repeat-min":0,
+          "repeat-max":-1
+        },
+        {
+          "type":"char-match",
+          "char-next-match":"quote-type"
+        }
+      ]
+    }
+  ]
+}

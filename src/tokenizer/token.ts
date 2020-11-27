@@ -32,37 +32,3 @@ export class Token {
   /**Standard maths operator type*/
   static TYPE_OPERATOR: string = "oper";
 }
-
-export class TokenAccessor {
-  tokens: Array<Token>;
-  offset: number;
-  constructor() {
-    this.offset = 0;
-  }
-  setTokens(tokens: Array<Token>): this {
-    this.tokens = tokens.slice(); //copy array
-    return this;
-  }
-  hasNext(): boolean {
-    return (this.offset < this.tokens.length);
-  }
-  setOffset(ind: number): this {
-    this.offset = ind;
-    return this;
-  }
-  /**Fetches next token without incrementing
-   */
-  peakNext(): Token {
-    return this.tokens[this.offset];
-  }
-  next(): Token {
-    let result = this.tokens[this.offset];
-    this.offset++;
-    return result;
-  }
-  rewind(count: number = 1): this {
-    this.offset -= count;
-    if (this.offset < 0) this.offset = 0;
-    return this;
-  }
-}
