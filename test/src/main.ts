@@ -1,4 +1,3 @@
 
-let myvar: number = 10;
-
-let othervar: number = 5;
+let test;
+let test2 = 0;

@@ -4,7 +4,7 @@ import { readTextFile, readJsonFile, ensureDir } from "./aliases.js";
 
 import { TypeScriptScanner } from "./langs/typescript/typescript.js";
 import { tokenizer } from "./tokenizer/tokenizer.js";
-import { parser } from "./parser/parser.js";
+import { Parser } from "./parser/parser.js";
 import { Language } from "./parser/language.js";
 
 const PRG_ARGS = process.argv;
@@ -101,27 +101,27 @@ async function main() {
 
   let tsScanner = new TypeScriptScanner();
 
-  let tsLangPath = path.join(__dirname, "langs", "typescript.json");
+  let tsLangPath = path.join(__dirname, "langs", "typescript", "typescript.json");
 
   let tsLang = Language.fromJSON(
     await readJsonFile(
       tsLangPath
     )
   );
-  console.log("Language", tsLang);
+  // console.log("Language", tsLang);
 
   tokenizer(src, tsScanner, ["whsp"]).then((tokens) => {
     console.log(tokens);
 
     doLog("Lexar finished, generating AST");
 
-    let tree = parser(tsLang, tokens);
+    let parser = new Parser();
+
+    let tree = parser.parse(tsLang, tokens);
   }).catch((ex) => {
     console.error(ex);
   });
-
-  let mynum = 0.1;
-
+  
   //write the text file
   //TODO - have to write transpiled assembly, not source input
   //WRITE TO: path.join(cliOriginDir, outputFileName)

@@ -6,7 +6,7 @@ const numbers = "0123456789";
 const ops = "-+/*%=";
 const ws = " \n";
 const nl = "\n";
-const idents = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+const idents = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789";
 const terms = ":;.,"
 const paren = "()";
 const brackets = "{[]}";
@@ -23,7 +23,7 @@ export class TypeScriptScanner extends Scanner {
   static PARENTHESIS: string = "pare";
   constructor() {
     super();
-    this.addPass(TypeScriptScanner.IDENTIFIER, (data, offset) => {
+    this.addPass(TypeScriptScanner.NUMBER_LITERAL, (data, offset) => {
       let result: ScannerData = {
         success: false,
         readChars: 0,
@@ -34,7 +34,7 @@ export class TypeScriptScanner extends Scanner {
 
       //no need to scan past what we can't handle, use only 309 max chars
       for (let i = offset; i < max; i++) {
-        if (idents.includes(data.charAt(i))) {
+        if (numbers.includes(data.charAt(i))) {
           result.readChars++;
         } else {
           if (result.readChars > 0) {
@@ -53,6 +53,36 @@ export class TypeScriptScanner extends Scanner {
 
       return result;
     })
+      .addPass(TypeScriptScanner.IDENTIFIER, (data, offset) => {
+        let result: ScannerData = {
+          success: false,
+          readChars: 0,
+          readLines: 0
+        };
+
+        const max = Math.min(data.length, offset + 309);
+
+        //no need to scan past what we can't handle, use only 309 max chars
+        for (let i = offset; i < max; i++) {
+          if (idents.includes(data.charAt(i))) {
+            result.readChars++;
+          } else {
+            if (result.readChars > 0) {
+              result.success = true;
+            }
+            return result;
+          }
+        }
+        // if (numbers.includes(data.charAt(offset+max))) {
+        //   result.success = false;
+        //   result.error = `too many number chars for a literal: ${data.substring(offset, offset+max)}`;
+        // }
+        if (result.readChars > 0) {
+          result.success = true;
+        }
+
+        return result;
+      })
       .addPass(TypeScriptScanner.STRING_LITERAL, (data, offset) => {
         let result: ScannerData = {
           success: false,
@@ -89,36 +119,6 @@ export class TypeScriptScanner extends Scanner {
             if (ignoreNextMatchQuote) ignoreNextMatchQuote = false;
           }
           result.readChars++;
-        }
-
-        return result;
-      })
-      .addPass(TypeScriptScanner.NUMBER_LITERAL, (data, offset) => {
-        let result: ScannerData = {
-          success: false,
-          readChars: 0,
-          readLines: 0
-        };
-
-        const max = Math.min(data.length, offset + 309);
-
-        //no need to scan past what we can't handle, use only 309 max chars
-        for (let i = offset; i < max; i++) {
-          if (numbers.includes(data.charAt(i))) {
-            result.readChars++;
-          } else {
-            if (result.readChars > 0) {
-              result.success = true;
-            }
-            return result;
-          }
-        }
-        // if (numbers.includes(data.charAt(offset+max))) {
-        //   result.success = false;
-        //   result.error = `too many number chars for a literal: ${data.substring(offset, offset+max)}`;
-        // }
-        if (result.readChars > 0) {
-          result.success = true;
         }
 
         return result;

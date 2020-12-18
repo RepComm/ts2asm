@@ -1,83 +1,92 @@
 
 import { Token } from "../tokenizer/token.js";
-import { Language, Statement } from "./language.js";
+import { Language, Requirement, RequirementType, Statement, StatementTemplate } from "./language.js";
 import { Accessor } from "../accessor.js";
 
-/**The simplified, generic AST parser
- * @param lang 
- * @param tokens 
- */
-export const parser = (lang: Language, tokens: Token[]): Statement => {
-  let tokenAccessor = new Accessor<Token>().setItems(tokens);
-  let treeRoot = new Statement();
+export class Parser {
+  private language: Language;
+  private accessor: Accessor<Token>;
 
-  let currentStatement: Statement;
-  let statementStack = new Array<Statement>();
+  private sRoot: Statement;
+  private sCurrent: Statement;
+  private sStack: Array<Statement>;
 
-  function save() {
-    if (!currentStatement) throw `Cannot save, currentStatement is ${currentStatement}`;
-    statementStack.push(currentStatement);
+  constructor() {
+    this.sStack = new Array();
+  }
+  save(): this {
+    if (!this.sCurrent) throw `Cannot save, current statement is ${this.sCurrent}, a falsy value`;
+    this.sStack.push(this.sCurrent);
+    return;
+  }
+  restore(): this {
+    this.sCurrent = this.sStack.pop();
+    return this;
   }
 
-  function restore() {
-    //TODO - check if stack was empty
-    currentStatement = statementStack.pop();
-  }
+  //FINISHED PHASE 1
+  findMatchingTemplate(templateId?: string) {
+    let result = false;
+    for (let template of this.language.getStatementTemplates()) {
+      if (templateId && templateId == template.getId()) continue;
+      //Will try to meet requirements at the current token (accessor keeps track of tokens)
+      this.accessor.save();
 
-  /**Parses tokens to create a statement
-   * If type is passed, the specific statement with that id will attempt to generate
-   * and if it does not match, the parent statement will also not be satisfied
-   * 
-   * @param statementId 
-   */
-  function generateStatement(allowAbstract: boolean = false, statementId: string = undefined): Statement {
-    let result: Statement;
-
-    for (let template of lang.getStatementTemplates()) {
-      //if we're looking for a specific statement type, and this one isn't it, skip
-      if (statementId != undefined && template.getId() != statementId) continue;
-      //if we can't parse an abstract template, and this one is, skip
-      if (!allowAbstract && template.isAbstract()) continue;
-
-      //check requirements to see if statement template is satisfied
-      let satisfied = true;
-      for (let requirement of template.getRequirements()) {
-        if (!satisfied) break;
-        //TODO - handle requirement.getRepeats();
-
-        switch (requirement.getType()) {
-          case "statement":
-            //TODO
-            //Save the parent so we can come back to sibling content
-            save();
-            break;
-          case "token":
-            let token = tokenAccessor.next();
-            if (requirement.getTokenType() != token.type) {
-              satisfied = false;
-            }
-            if (requirement.getTokenData() != token.data) {
-              satisfied = false;
-            }
-            currentStatement.addItem(token);
-            break;
-        }
+      if(this.meetTemplateRequirements(template.getRequirements())) {
+        result = true;
+        let matchedTokens = this.accessor.slice(
+          this.accessor.getLastSave(),
+          this.accessor.getOffset()
+        );
+        console.log("found", template.getId(), "with", matchedTokens);
+        //if success, we don't want to jump back, but still remove the saved value
+        this.accessor.restore(true);
+        break;
       }
-
-      //If statement template was satisified, break out of loop
-      if (satisfied) break;
+      this.accessor.restore();
     }
     return result;
   }
 
-  //Make the root accessable to stack save / restore
-  currentStatement = treeRoot;
-
-  //loop through all tokens
-  while (tokenAccessor.hasNext()) {
-    //try to consume all tokens
-    generateStatement();
+  //FINISHED PHASE 1
+  tokenMeetRequirement (token: Token, requirement: Requirement): boolean {
+    let result = true;
+    if (requirement.hasTokenType() && token.type !== requirement.getTokenType()) result = false;
+    if (requirement.hasTokenData() && token.data !== requirement.getTokenData()) result = false;
+    return result;
   }
 
-  return treeRoot;
+  //FINISHED PHASE 1
+  meetTemplateRequirements (requirements: Array<Requirement>): boolean {
+    for (let requirement of requirements) {
+      if (requirement.getType() == "token") {
+        if (!this.tokenMeetRequirement(
+          this.accessor.next(),
+          requirement
+        )) {
+          return false;
+        }
+
+      } else if (requirement.getType() == "statement") {
+        //DEBUG - this is causing infiniloop
+        return false;
+
+        //TODO - implement abstract
+        this.findMatchingTemplate(requirement.getStatementId());
+      }
+    }
+    return true;
+  }
+
+  parse(lang: Language, tokens: Token[]) {
+    this.language = lang;
+    this.accessor = new Accessor<Token>().setItems(tokens);
+
+    while (this.accessor.hasNext()) {
+      if (!this.findMatchingTemplate()) {
+        console.log("fail");
+        break;
+      }
+    }
+  }
 }

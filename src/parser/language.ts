@@ -96,6 +96,7 @@ export class Language {
   }
   addStatementTemplate(template: StatementTemplate): this {
     if (this.hasStatementTemplate(template)) throw `Cannot add statement template more than once ${template}`;
+    this.statmentTemplates.add(template);
     return this;
   }
   createStatementTemplate(id: string): StatementTemplate {
@@ -103,7 +104,7 @@ export class Language {
     this.addStatementTemplate(result);
     return result;
   }
-  getStatementTemplates (): Set<StatementTemplate> {
+  getStatementTemplates(): Set<StatementTemplate> {
     return this.statmentTemplates;
   }
   static fromJSON(langDef: LanguageDefinition): Language {
@@ -117,10 +118,10 @@ export class Language {
 
     return result;
   }
-  toJSON (): LanguageDefinition {
+  toJSON(): LanguageDefinition {
     let templateCount = this.statmentTemplates.size;
     let templateDefs = new Array<StatementDefinition>(templateCount);
-    let i=0;
+    let i = 0;
     for (let template of this.statmentTemplates) {
       templateDefs[i] = template.toJSON();
       i++;
@@ -160,7 +161,7 @@ export class StatementTemplate {
   isAbstract(): boolean {
     return this.abstract;
   }
-  hasRequirement (req: Requirement): boolean {
+  hasRequirement(req: Requirement): boolean {
     return this.requirements.includes(req);
   }
   addRequirement(req: Requirement): this {
@@ -168,7 +169,7 @@ export class StatementTemplate {
     this.requirements.push(req);
     return this;
   }
-  getRequirements (): Array<Requirement> {
+  getRequirements(): Array<Requirement> {
     return this.requirements;
   }
   static fromJSON(statDef: StatementDefinition): StatementTemplate {
@@ -183,11 +184,11 @@ export class StatementTemplate {
 
     return result;
   }
-  toJSON (): StatementDefinition {
+  toJSON(): StatementDefinition {
     let requirementCount = this.requirements.length;
     let requirementDefs = new Array<RequirementDefinition>(requirementCount);
 
-    let i=0;
+    let i = 0;
     for (let requirement of this.requirements) {
       requirementDefs[i] = requirement.toJSON();
       i++;
@@ -208,7 +209,7 @@ export class Requirement {
   private tokenType?: string;
   private tokenData?: string;
 
-  constructor () {
+  constructor() {
     this.repeat = 0;
   }
   getType(): RequirementType {
@@ -218,31 +219,37 @@ export class Requirement {
     this.type = type;
     return this;
   }
-  getTokenType (): string|undefined {
+  getTokenType(): string | undefined {
     return this.tokenType;
   }
-  setTokenType (type: string): this {
+  setTokenType(type: string): this {
     this.tokenType = type;
     return this;
   }
-  getTokenData(): string|undefined {
+  hasTokenType(): boolean {
+    return this.tokenType != null && this.tokenType != undefined;
+  }
+  getTokenData(): string | undefined {
     return this.tokenData;
   }
-  setTokenData (data: string): this {
+  setTokenData(data: string): this {
     this.tokenData = data;
     return this;
   }
-  getStatementId (): string|undefined {
+  hasTokenData(): boolean {
+    return this.tokenData != null && this.tokenData != undefined;
+  }
+  getStatementId(): string | undefined {
     return this.statementId;
   }
-  setStatementId (id: string): this {
+  setStatementId(id: string): this {
     this.statementId = id;
     return this;
   }
-  hasStatementId (): boolean {
+  hasStatementId(): boolean {
     return this.statementId != null && this.statementId != null;
   }
-  getRepeats (): number {
+  getRepeats(): number {
     return this.repeat;
   }
   /**Set how many times to repeat this requirement to satisfy a statement using it
@@ -255,11 +262,11 @@ export class Requirement {
    * 
    * @param times 
    */
-  setRepeats (times: number): this {
+  setRepeats(times: number): this {
     this.repeat = times;
     return this;
   }
-  static fromJSON (def: RequirementDefinition): Requirement {
+  static fromJSON(def: RequirementDefinition): Requirement {
     let result = new Requirement();
     result.setType(def.type);
 
@@ -270,7 +277,7 @@ export class Requirement {
     result.setRepeats(def.repeat);
     return result;
   }
-  toJSON (): RequirementDefinition {
+  toJSON(): RequirementDefinition {
     //TODO - error check here
     return {
       type: this.getType(),
@@ -291,10 +298,10 @@ export type StatementItem = Token | Statement;
  */
 export class Statement {
   items: Array<StatementItem>;
-  constructor () {
+  constructor() {
     this.items = new Array();
   }
-  addItem (item: StatementItem): this {
+  addItem(item: StatementItem): this {
     this.items.push(item);
     return this;
   }

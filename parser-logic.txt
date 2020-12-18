@@ -1,0 +1,23 @@
+
+given: tokens
+given: language: templates: requirements: token, template
+
+task: find matching template
+  loop template of templates
+    call: meet requirements of template
+    break if success
+  error if no success
+
+task: meet requirements of template
+  loop requirement of requirements
+    if requirement is a token
+      access next token
+      call: compare token to requirement
+      return fail if not comparable
+    
+    if requirement is a template
+      call: find matching template
+  return success      
+      
+task: compare token to requirement
+  

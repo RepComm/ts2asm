@@ -2,14 +2,34 @@
 export class Accessor<T> {
   protected internal: Array<T>;
   protected offset: number;
+  private stack: Array<number>;
 
   constructor(size: number = 0) {
     this.internal = new Array(size);
     this.offset = 0;
+    this.stack = new Array();
+  }
+  save (): this {
+    this.stack.push(this.offset);
+    return this;
+  }
+  getLastSave (): number {
+    return this.stack[this.stack.length-1];
+  }
+  slice (from: number, to: number): Array<T> {
+    return this.internal.slice(from, to);
+  }
+  restore (popOnly: boolean = false): this {
+    let v = this.stack.pop();
+    if (!popOnly) this.setOffset(v);
+    return this;
   }
   setOffset(offset: number): this {
     this.offset = offset;
     return this;
+  }
+  getOffset (): number {
+    return this.offset;
   }
   rewind(count: number = 1): this {
     this.offset -= count;
