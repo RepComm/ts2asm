@@ -28,7 +28,7 @@ export class Parser {
   findMatchingTemplate(templateId?: string) {
     let result = false;
     for (let template of this.language.getStatementTemplates()) {
-      if (templateId && templateId == template.getId()) continue;
+      if (templateId && templateId !== template.getId()) continue;
       //Will try to meet requirements at the current token (accessor keeps track of tokens)
       this.accessor.save();
 
@@ -68,11 +68,8 @@ export class Parser {
         }
 
       } else if (requirement.getType() == "statement") {
-        //DEBUG - this is causing infiniloop
-        return false;
-
         //TODO - implement abstract
-        this.findMatchingTemplate(requirement.getStatementId());
+        return this.findMatchingTemplate(requirement.getStatementId());
       }
     }
     return true;
